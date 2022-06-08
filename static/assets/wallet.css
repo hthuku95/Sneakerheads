@@ -1,0 +1,11 @@
+button.ml-2 {
+    background-color: #c73161;
+}
+
+ul > li > span.transaction-spend {
+    color: rgb(195, 65, 65);
+}
+
+ul > li > span.transaction-earned {
+    color: rgb(56, 167, 56);
+}

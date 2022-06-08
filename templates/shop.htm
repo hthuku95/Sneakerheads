@@ -1,0 +1,39 @@
+{%extends 'base_layout.htm'%}
+{%block content%}
+<section id="featured" class="my-5 py-5">
+    <div class="container mt-5 py-5">
+        <h2 class="font-weight-bold">Sneakerheads Shop</h2>
+        <hr>
+        <p>Here you can get all products from sneakerheads</p>
+    </div>
+    <div class="row mx-auto container">
+        {% for item in object_list %}
+            <div class="product text-center col-lg-3 col-md-4 col-12">
+                <img class="img-fluid mb-3" src="{{item.thumbnail.url}}" alt="">
+                <div class="star">
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                    <i class="fa fa-star"></i>
+                </div>
+                <h5 class="p-name">
+                    <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+                </h5>
+                <h4 class="p-price">
+                    <strong>$
+                        {% if item.discount_price %}
+                        {{ item.discount_price }}
+                        {% else %}
+                        {{ item.price }}
+                        {% endif %}
+                    </strong>
+                </h4>
+                <button class="buy-btn">
+                    <a href="{{ item.get_add_to_cart_url }}">Buy Now</a>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{%endblock%}

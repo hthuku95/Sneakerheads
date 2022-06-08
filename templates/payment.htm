@@ -1,0 +1,41 @@
+{% extends "base_layout.htm" %}
+
+
+
+{% block extra_head %}
+
+{% endblock extra_head %}
+
+
+{% block content %}
+<div class="container my-5 pt-5">
+  <div class="card" style="width: 100%;">
+    <div class="card-body">
+      <h1>Payment Summary</h1>
+      <p><bold>Reference ID:</bold> {{ order.ref_code }}</p>
+      <p><bold>Total price:</bold> {{order.get_total}}</p>
+      <p><bold>Billing Address:</bold> {{order.billing_address}}</p>
+      <p><bold>Shipping Address:</bold> {{order.shipping_address}}</p>
+    </div>
+    <ul class="list-group list-group-flush">
+      <h2 class="p-3"> Cart Items: </h2>
+      {% for order_item in order.items.all %}
+        <li class="list-group-item">{{order_item.item.title}}, ${{order_item.get_final_price}}</li>
+      {% empty %}
+        <li class="list-group-item">
+            You do not have any items in your order
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="card-body text-center">
+      <h4>Pay with PayPal</h4>
+      {{ form.render }}
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+
+{% block extra_scripts %}
+
+{% endblock extra_scripts %}

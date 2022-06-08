@@ -1,0 +1,177 @@
+{%extends 'base_layout.htm'%}
+{% load static %}
+{%block content%}
+<section id="home">
+    <div class="container">
+        <h5>NEW ARRIVALS</h5>
+        <h1><span>Best Price</span> This Year</h1>
+        <p>Get all your sneakers and clothes <br> from one place </p>
+        <button>
+            <a href="{%url 'core:shop' %}">Shop now </a>
+        </button>
+    </div>
+</section>
+
+<section id="brand" class="container">
+    <div class="row m-0 py-5">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/1.png'%}" alt="">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/2.png'%}" alt="">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/3.png'%}" alt="">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/4.png'%}" alt="">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/5.png'%}" alt="">
+        <img class="img-fluid col-md-1 col-md-2 col-6" src="{% static 'assets/img/brand/6.png'%}" alt="">
+    </div>
+</section>
+
+<section id="new" class="w-100">
+    <div class="row p-0 m-0">
+        <div class="one col-lg-4 col-md-12 col-12 p-0">
+            <img  class="img-fluid" src="{% static 'assets/img/new/1.jpg'%}" alt="">
+            <div class="details">
+                <h2>Latest Sneakers</h2>
+                <button class="text-uppercase">
+                    <a href="{%url 'core:shop' %}">Shop now </a>
+                </button>
+            </div>
+        </div>
+        <div class="one col-lg-4 col-md-12 col-12 p-0">
+            <img  class="img-fluid" src="{% static 'assets/img/new/5.jpg'%}" alt="">
+            <div class="details">
+                <h2>Women's collection</h2>
+                <button class="text-uppercase">
+                    <a href="{%url 'core:shop' %}">Shop now </a>
+                </button>
+            </div>
+        </div>
+        <div class="one col-lg-4 col-md-12 col-12 p-0">
+            <img  class="img-fluid" src="{% static 'assets/img/new/3.jpg'%}" alt="">
+            <div class="details">
+                <h2>Watches</h2>
+                <button class="text-uppercase">
+                    <a href="{%url 'core:shop' %}">Shop now </a>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="featured" class="my-5 pb-5">
+    <div class="container text-center mt-5 py-5">
+        <h3>Our featured products</h3>
+        <hr class="mx-auto">
+        <p>Here you can check out our new products with fair price on sneakerheads</p>
+    </div>
+    <div class="row mx-auto container-fluid">
+        {% for featured_item in featured_items %}
+        <div class="product text-center col-lg-3 col-md-4 col-12">
+            <img class="img-fluid mb-3" src="{{featured_item.thumbnail.url}}" alt="">
+            <div class="star">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            </div>
+            <h5 class="p-name">
+                <a href="{{ featured_item.get_absolute_url }}">{{ featured_item.title }}</a>
+            </h5>
+            <h4 class="p-price">
+                <strong>$
+                    {% if featured_item.discount_price %}
+                    {{ featured_item.discount_price }}
+                    {% else %}
+                    {{ featured_item.price }}
+                    {% endif %}
+                </strong>
+            </h4>
+            <button class="buy-btn">
+                <a href="{{ featured_item.get_add_to_cart_url }}">Buy Now</a>
+            </button>
+        </div>
+    {% endfor %}
+    </div>
+</section>
+
+<section id="banner" class="my-5 py-5">
+    <div class="container">
+        <h4>MID SEASON'S SALE</h4>
+        <h1>Autumn Collection <br> UP TO 20% OFF</h1>
+        <button class="text-uppercase">Shop Now</button>
+    </div>
+</section>
+
+<section id="featured" class="my-5 pb-5">
+    <div class="container text-center mt-5 py-5">
+        <h3>More Clothes from Sneakerheads</h3>
+        <hr class="mx-auto">
+        <p>Shop all the best clothes from sneakerheads</p>
+    </div>
+    <div class="row mx-auto container-fluid">
+        {% for item in items %}
+        <div class="product text-center col-lg-3 col-md-4 col-12">
+            <img class="img-fluid mb-3" src="{{item.thumbnail.url}}" alt="">
+            <div class="star">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            </div>
+            <h5 class="p-name">
+                <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+            </h5>
+            <h4 class="p-price">
+                <strong>$
+                    {% if item.discount_price %}
+                    {{ item.discount_price }}
+                    {% else %}
+                    {{ item.price }}
+                    {% endif %}
+                </strong>
+            </h4>
+            <button class="buy-btn">
+                <a href="{{ item.get_add_to_cart_url }}">Buy Now</a>
+            </button>
+        </div>
+    {% endfor %}
+    </div>
+</section>
+<section id="featured" class="my-5 pb-5">
+    <div class="container text-center mt-5 py-5">
+        <h3>Best Watches</h3>
+        <hr class="mx-auto">
+        <p>Here you can find the best watches from sneakerheads</p>
+    </div>
+    <div class="row mx-auto container-fluid">
+        {% for watch in watches %}
+        <div class="product text-center col-lg-3 col-md-4 col-12">
+            <img class="img-fluid mb-3" src="{{watch.thumbnail.url}}" alt="">
+            <div class="star">
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+                <i class="fa fa-star"></i>
+            </div>
+            <h5 class="p-name">
+                <a href="{{ watch.get_absolute_url }}">{{ watch.title }}</a>
+            </h5>
+            <h4 class="p-price">
+                <strong>$
+                    {% if watch.discount_price %}
+                    {{ watch.discount_price }}
+                    {% else %}
+                    {{ watch.price }}
+                    {% endif %}
+                </strong>
+            </h4>
+            <button class="buy-btn">
+                <a href="{{ watch.get_add_to_cart_url }}">Buy Now</a>
+            </button>
+        </div>
+    {% endfor %}
+    </div>
+</section>
+
+
+{%endblock%}

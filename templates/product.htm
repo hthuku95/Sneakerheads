@@ -1,0 +1,60 @@
+{%extends 'base_layout.htm'%}
+{%load static%}
+
+{%block extra_head%}
+<link rel="stylesheet" href="{% static 'assets/product_description.css' %}">
+{%endblock extra_head%}
+
+
+{%block content%}
+<section class="container sproduct my-5 pt-5">
+    <div class="row mt-5">
+        <div class="col-lg-5 col-md-12 col-12">
+            <img class="img-fluid w-100 pb-1" id="mainImg" src="{{object.thumbnail.url}}" alt="Product thumbnail">
+
+            <div class="small-img-group">
+                <div class="small-img-col">
+                    <img src="{{object.thumbnail.url}}" class="small-img" width="100%" alt="">
+                </div>
+                <div class="small-img-col">
+                    <img src="{{object.display_image_one.url}}" class="small-img" width="100%" alt="">
+                </div>
+                <div class="small-img-col">
+                    <img src="{{object.display_image_two.url}}" class="small-img" width="100%" alt="">
+                </div>
+                <div class="small-img-col">
+                    <img src="{{object.display_image_three.url}}" class="small-img" width="100%" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12 col-12">
+            <h6>{{ object.get_category_display }}</h6>
+            <h3 class="py-4">{{object.title}}</h3>
+            <h2>
+                {% if object.discount_price %}
+                <del>${{ object.price }}</del>
+                <h2>${{ object.discount_price }}</h2>
+                {% else %}
+                <h2>${{ object.price }}</h2>
+                {% endif %}
+            </h2>
+            <input type="number" value="1">
+            <button class="buy-btn">
+                <a href="{{object.get_add_to_cart_url}}">Add To Cart</a>
+            </button>
+            <button class="buy-btn">
+                <a href="{{object.remove_from_cart_url}}">Remove From Cart</a>
+            </button>
+            
+            <h4 class="mt-5 mb-5">Product Details</h4>
+            <span>
+                {{ object.description }}
+            </span>
+        </div>
+    </div>
+</section>
+{%endblock%}
+
+{% block extra_scripts %}
+<script src="{%static 'assets/main.js'%}" type="text/javascript"></script>
+{% endblock extra_scripts %}

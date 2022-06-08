@@ -1,0 +1,35 @@
+{%extends 'base_layout.htm'%}
+{%load static%}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'assets/withdraw.css' %}">
+{% endblock extra_head %}
+{%block content%}
+<main>
+    <div class="container">
+      <h2 class="my-5 text-center">Withdraw</h2>
+      <div class="row">
+        <div class="col-md-8 mb-4">
+          <div class="card">
+            <form method="POST" action="/shop/withdraw_funds/" class="card-body">
+              {%csrf_token%}
+                <h2 class="my-5">Enter Amount you wish to withdraw</h2>
+                <div class='hideable_billing_form'>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" name="amount" class="form-control"  aria-label="Amount (to the nearest dollar)">
+                        <div class="input-group-append">
+                          <span class="input-group-text">.00</span>
+                        </div>
+                      </div>
+                    <button class="buy-btn" type="submit">Submit Amount</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</main>
+
+{% endblock %}
