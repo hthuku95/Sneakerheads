@@ -8,7 +8,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CheckoutForm, CouponForm, RefundForm, WalletPaymentForm,WalletDepositForm,WalletWithdrawForm
 from django.conf import settings 
-from paypal.standard.forms import PayPalPaymentsForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import string
@@ -265,44 +264,15 @@ class CheckoutView(View):
 def payment_view(request):
     order = Order.objects.get(user=request.user,ordered=False)
     wallet = Wallet.objects.get(user= request.user)
-    order_id = request.session.get('order_id')
-    host = request.get_host()
-
-    paypal_dict = {
-        'business': settings.PAYPAL_RECEIVER_EMAIL,
-        'amount': '%.2f' % order.get_total(),
-        'item_name': 'Order {}'.format(order.ref_code),
-        'invoice': str(order.ref_code),
-        'currency_code': 'USD',
-        'notify_url': 'http://{}{}'.format(host,
-                                           reverse('paypal-ipn')),
-        'return_url': 'http://{}{}'.format(host,
-                                           reverse('core:payment_done')),
-        'cancel_return': 'http://{}{}'.format(host,
-                                              reverse('core:payment_cancelled')),
-    }
-
-    form = PayPalPaymentsForm(initial=paypal_dict)
     
     context = {
                 'wallet':wallet,
                 'order':order,
-                'form':form,
               }
     return render(request,'payment.htm',context)
 
 
 
-@csrf_exempt
-def payment_done(request):
-    messages.success(request, "Your payment has been completed succesfully")
-    return redirect("core:shop")
-
-
-@csrf_exempt
-def payment_canceled(request):
-    messages.warning(request, "Your payment has been cancelled. Please try again later")
-    return redirect("core:shop")
 
 class WalletView(View):
     def get(self,*args,**kwargs):

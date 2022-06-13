@@ -1,5 +1,4 @@
 import os
-import dj_database_url 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,8 +34,6 @@ INSTALLED_APPS = [
 
     'core',
 
-    #paypal
-    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -81,8 +78,6 @@ DATABASES = {
     }
 }
 
-prod_db  =  dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(prod_db)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -139,15 +134,6 @@ SITE_ID = 1
 
 LOGIN_REDIRECT_URL = "/"
 
-#PAYPAL PUBLIC KEY (SANDBOX) (CLIENT_ID)
-PAYPAL_PUBLIC_KEY = 'AVdPGpTHRuq4ZmXsO9iBzv4TZevdPrO7wQi3K4SfwgCa2-FwAv54CsseqinU69vvCQ4-aKiw7g-YV-R6'
-
-#PAYPAL SECRET KEY (SANDBOX)  (CLIENT_SECRET)
-PAYPAL_SECRET_KEY = 'EK3lu9JRq2Trr6cLyrXrG6L-cC5NvX8vxNwWrfpQ2T49KcjcnYczBHQQMKpraFwRkpBT7dyAAyB2OSM2'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-PAYPAL_RECEIVER_EMAIL = 'bizsneakerheads@gmail.com'
-
-PAYPAL_TEST = True
