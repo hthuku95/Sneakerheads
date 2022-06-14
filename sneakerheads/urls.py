@@ -10,6 +10,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path(r'',index_view,name='home'),
     path('shop/', include('core.urls')),
+    path('paypal/', include('paypal.standard.ipn.urls')),
 ]
 
 #appending the static files urls to the above media

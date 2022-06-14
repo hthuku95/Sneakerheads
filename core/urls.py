@@ -12,6 +12,8 @@ from .views import (
     WalletView,
     WithdrawView,
     DepositView,
+    payment_canceled,
+    payment_done
 )
 
 app_name = 'core'
@@ -28,4 +30,6 @@ urlpatterns = [
     path(r'withdraw_funds/',WithdrawView.as_view(),name='withdraw-funds'),
     path(r'remove_from_cart/<slug>/',remove_from_cart,name='remove-from-cart'),
     path(r'remove_single_item_from_cart/<slug>/',remove_single_item_from_cart, name='remove-single-item-from-cart'),
+    path('payment-done/', payment_done, name='payment_done'),
+    path('payment-cancelled/', payment_canceled, name='payment_cancelled'),
 ]

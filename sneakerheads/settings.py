@@ -34,6 +34,7 @@ INSTALLED_APPS = [
 
     'core',
 
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,7 @@ LOGIN_REDIRECT_URL = "/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# PayPal
+PAYPAL_RECEIVER_EMAIL = 'bizsneakerheads@mail.com'
+
+PAYPAL_TEST = True
