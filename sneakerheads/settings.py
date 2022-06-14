@@ -13,7 +13,7 @@ SECRET_KEY = 'pz(9!u28(2)t4@zy=w&4f9q$uybhfqiq2wg4#7$fa*uwor74dq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sneakerheadsapp.herokuapp.com','*']
 
 
 # Application definition
@@ -142,3 +142,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PAYPAL_RECEIVER_EMAIL = 'bizsneakerheads@mail.com'
 
 PAYPAL_TEST = True
+
+#  Add configuration for static files storage using whitenoise
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+import dj_database_url 
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
