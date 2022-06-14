@@ -1,0 +1,1 @@
+web: gunicorn sneakerheads.wsgi --log-file -
