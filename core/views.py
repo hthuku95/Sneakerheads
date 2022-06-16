@@ -9,7 +9,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import CheckoutForm, CouponForm, RefundForm, WalletPaymentForm,WalletDepositForm,WalletWithdrawForm
 from django.conf import settings 
 from decimal import Decimal
-from paypal.standard.forms import PayPalPaymentsForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 import string

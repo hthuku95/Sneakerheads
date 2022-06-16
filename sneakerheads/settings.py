@@ -34,7 +34,6 @@ INSTALLED_APPS = [
 
     'core',
 
-    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -136,13 +135,6 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = "/"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# PayPal
-PAYPAL_RECEIVER_EMAIL = 'bizsneakerheads@mail.com'
-
-PAYPAL_TEST = True
-
 
 import dj_database_url 
 prod_db  =  dj_database_url.config(conn_max_age=500)
