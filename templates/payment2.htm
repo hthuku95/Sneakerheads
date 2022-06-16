@@ -61,7 +61,10 @@
         }
 
         const csrftoken = getCookie('csrftoken');
-        var productId = "{{order.ref_code}}"
+
+        function createOrderCookie() {
+          document.cookie = 'orderRefCode={{order.ref_code}}'
+        }
 
         function completeOrder() {
           var url = "{% url 'core:complete'%}"
@@ -71,9 +74,10 @@
             headers:{
               'Content-type':'application/json',
               'X-CSRFToken':csrftoken
-            },
-            body:sessionStorage.setItem('productId', productId)
-          })
+            }
+          }).then(
+            createOrderCookie()
+          )
         }
 
         paypal.Buttons({
@@ -98,7 +102,6 @@
 
                     completeOrder()
 
-                    alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
                 });
             }
 

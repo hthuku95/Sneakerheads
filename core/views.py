@@ -20,6 +20,9 @@ import random
 def create_ref_code():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
 
+def create_charge_id():
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+
 class ShopView(ListView):
     model = Item
     template_name = 'shop.htm'
@@ -266,43 +269,51 @@ class CheckoutView(View):
 def payment_view(request):
     order = Order.objects.get(user=request.user,ordered=False)
     wallet = Wallet.objects.get(user= request.user)
-    order_id = request.session.get('order_id')
-    host = request.get_host()
-    
-    paypal_dict = {
-        'business': settings.PAYPAL_RECEIVER_EMAIL,
-        'amount': '%.2f' % order.get_total(),
-        'item_name': 'Order {}'.format(order.id),
-        'invoice': str(order.id),
-        'currency_code': 'USD',
-        'notify_url': 'http://{}{}'.format(host,
-                                           reverse('paypal-ipn')),
-        'return_url': 'http://{}{}'.format(host,
-                                           reverse('core:payment_done')),
-        'cancel_return': 'http://{}{}'.format(host,
-                                              reverse('core:payment_cancelled')),
-    }
-
-    form = PayPalPaymentsForm(initial=paypal_dict)
 
     context = {
                 'wallet':wallet,
                 'order':order,
-                'form':form
               }
-    return render(request,'payment.htm',context)
 
-@csrf_exempt
-def payment_done(request):
-    messages.success(request, "Your payment was completed succesfully")
-    return render(request, 'shop.htm')
+    return render(request,'payment2.htm',context)
 
+def payment_complete(request):
+    wallet = Wallet.objects.get(user= request.user)
+    orderRefCode = ''
+    if 'orderRefCode' in request.COOKIES:
+        orderRefCode = request.COOKIES['orderRefCode']
+        order = Order.objects.get(ref_code=orderRefCode)
 
-@csrf_exempt
-def payment_canceled(request):
-    messages.warning(request, "Something went wrong with your payment. plese try again later")
-    return render(request, 'index.htm')
+        order.ordered = True
+        order.save()
 
+        charge = create_charge_id()
+        charge = charge.upper()
+
+        payment = Payment(
+            charge_id=charge,
+            user=order.user,
+            amount=order.get_total()
+        )
+
+        payment.save()
+
+        order.payment = payment
+        order.save()
+
+        transaction = TransactionRecord(
+            wallet=wallet,
+            amount=order.get_total(),
+            transaction_type='S'
+        )
+
+        transaction.save()
+
+        messages.success(request,"Your order has been completed Successfully")
+        return redirect("home")
+
+    messages.warning(request,"An error occured. Please try again")
+    return redirect("home")
 
 class WalletView(View):
     def get(self,*args,**kwargs):
