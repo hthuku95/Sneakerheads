@@ -13,7 +13,7 @@
           <div class="card">
             <form method="POST" class="card-body">
                 {% csrf_token %}
-              {% if order.type == 'BG' %}
+              {% if order.order_type == 'BG' %}
                 <h2 class="my-5">Shipping address</h2>
                 <div class='hideable_shipping_form'>
 

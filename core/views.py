@@ -289,7 +289,7 @@ class CheckoutView(View):
                     )
                     transaction.save()
 
-                    messages.success(request, "Yor order has been completed successfully")
+                    messages.success(self.request, "Yor order has been completed successfully")
                     return redirect("home")
                 return redirect("core:payment")
 

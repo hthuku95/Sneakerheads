@@ -153,10 +153,9 @@ class Order(models.Model):
         return self.user.username
         
     def get_total(self):
-        total = self.value
         for order_item in self.items.all():
-            total += order_item.get_final_price()
-        return total
+            self.value += order_item.get_final_price()
+        return self.value
 
 class Wallet(models.Model):
     id = models.AutoField(primary_key=True)
