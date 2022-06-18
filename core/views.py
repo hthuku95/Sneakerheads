@@ -1,5 +1,5 @@
 from django.views.generic import ListView,DetailView,View
-from core.models import Item, Order, OrderItem,Address,Payment,UserProfile,Coupon,Refund,Wallet,TransactionRecord
+from core.models import Item, Order, OrderItem,Address,Payment,UserProfile,Coupon,Refund,Wallet,TransactionRecord,DepositRequest
 from django.shortcuts import render, redirect, get_object_or_404,reverse
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -51,7 +51,7 @@ def add_to_cart(request, slug):
         user=request.user,
         ordered=False
     )
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    order_qs = Order.objects.filter(user=request.user, order_type ='BG', ordered=False)
     if order_qs.exists():
         order = order_qs[0]
         # check if the order item is in the order
@@ -71,7 +71,7 @@ def add_to_cart(request, slug):
         ref_code = ref_code.upper()
 
         order = Order.objects.create(
-            user=request.user, ordered_date=ordered_date,ref_code = ref_code)
+            user=request.user, order_type='BG', ordered_date=ordered_date,ref_code = ref_code)
         order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
         return redirect("core:order-summary")
@@ -79,7 +79,7 @@ def add_to_cart(request, slug):
 @login_required
 def remove_from_cart(request,slug):
     item = get_object_or_404(Item,slug=slug)
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    order_qs = Order.objects.filter(user=request.user, order_type='BG', ordered=False)
 
     if order_qs.exists():
         order = order_qs[0]
@@ -104,7 +104,8 @@ def remove_single_item_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_qs = Order.objects.filter(
         user=request.user,
-        ordered=False
+        ordered=False,
+        order_type= 'BG'
     )
     if order_qs.exists():
         order = order_qs[0]
@@ -173,46 +174,47 @@ class CheckoutView(View):
         
         try:
             order = Order.objects.get(user=self.request.user,ordered=False)
+            wallet = Wallet.objects.get(user=self.request.user)
             if form.is_valid():
+                if order.order_type == 'BG':
+                    use_default_shipping = form.cleaned_data.get('use_default_shipping')
+                    if use_default_shipping:
+                        print("Using the default shipping address")
+                        address_qs = Address.objects.filter(
+                            user = self.request.user,
+                            default = True,
+                            address_type = 'S'
+                        )
+                        if address_qs.exists():
+                            shipping_address = address_qs[0]
+                            order.shipping_address = shipping_address
+                            order.save()
+                        else:
+                            messages.info(self.request,"No default shipping Address available")
+                            return redirect("core:checkout")
+                    else:
+                        print("user is entering a new shipping address")
+                        shipping_address1 = form.cleaned_data.get('shipping_address')
+                        shipping_address2 = form.cleaned_data.get('shipping_address2')
+                        shipping_zip = form.cleaned_data.get('shipping_zip')
 
-                use_default_shipping = form.cleaned_data.get('use_default_shipping')
-                if use_default_shipping:
-                    print("Using the default shipping address")
-                    address_qs = Address.objects.filter(
-                        user = self.request.user,
-                        default = True,
-                        address_type = 'S'
-                    )
-                    if address_qs.exists():
-                        shipping_address = address_qs[0]
+                        # creating a new shipping address
+                        shipping_address = Address(
+                            user = self.request.user,
+                            street_address = shipping_address1,
+                            apartment_address = shipping_address2,
+                            zip = shipping_zip,
+                            address_type = 'S'
+                        )
+
+                        shipping_address.save()
                         order.shipping_address = shipping_address
                         order.save()
-                    else:
-                        messages.info(self.request,"No default shipping Address available")
-                        return redirect("core:checkout")
-                else:
-                    print("user is entering a new shipping address")
-                    shipping_address1 = form.cleaned_data.get('shipping_address')
-                    shipping_address2 = form.cleaned_data.get('shipping_address2')
-                    shipping_zip = form.cleaned_data.get('shipping_zip')
 
-                    # creating a new shipping address
-                    shipping_address = Address(
-                        user = self.request.user,
-                        street_address = shipping_address1,
-                        apartment_address = shipping_address2,
-                        zip = shipping_zip,
-                        address_type = 'S'
-                    )
-
-                    shipping_address.save()
-                    order.shipping_address = shipping_address
-                    order.save()
-
-                    set_default_shipping = form.cleaned_data.get('set_default_shipping')
-                    if set_default_shipping:
-                        shipping_address.default = True
-                        shipping_address.save()
+                        set_default_shipping = form.cleaned_data.get('set_default_shipping')
+                        if set_default_shipping:
+                            shipping_address.default = True
+                            shipping_address.save()
 
                 use_default_billing = form.cleaned_data.get('use_default_billing')
                 same_billing_address = form.cleaned_data.get('same_billing_address')
@@ -258,6 +260,37 @@ class CheckoutView(View):
                     if set_default_billing:
                         billing_address.default = True
                         billing_address.save()
+
+                # Wallet Payment
+                if order.order_type == 'BG' and wallet.balance > order.get_total() + 10:
+                    order.ordered = True
+                    order.save()
+
+                    charge = create_charge_id()
+                    charge = charge.upper()
+
+                    payment = Payment(
+                        charge_id=charge,
+                        user=order.user,
+                        amount=order.get_total()
+                    )
+
+                    payment.save()
+
+                    order.payment = payment
+                    order.save()
+                    wallet.balance -= order.get_total()
+                    wallet.save()
+
+                    transaction = TransactionRecord(
+                        wallet=wallet,
+                        amount=order.get_total(),
+                        transaction_type= 'S'
+                    )
+                    transaction.save()
+
+                    messages.success(request, "Yor order has been completed successfully")
+                    return redirect("home")
                 return redirect("core:payment")
 
         except ObjectDoesNotExist:
@@ -299,6 +332,20 @@ def payment_complete(request):
 
         order.payment = payment
         order.save()
+
+        if order.order_type == 'D':
+
+            wallet.balance += order.get_total()
+
+            transaction = TransactionRecord(
+                wallet=wallet,
+                amount=order.get_total(),
+                transaction_type='E'
+            )
+            transaction.save()
+
+            messages.success(request,"Deposit completed succesfully")
+            return redirect("core:wallet")
 
         transaction = TransactionRecord(
             wallet=wallet,
@@ -408,19 +455,32 @@ class DepositView(View):
 
             if form.is_valid():
                 amount = form.cleaned_data.get('amount')
-                wallet.balance+= amount
-                wallet.save()
+                
+                deposit_request = DepositRequest(
+                    wallet=wallet,
+                    amount=amount
+                )
+                deposit_request.save()
 
-                transaction_record = TransactionRecord(
-                        wallet=wallet,
-                        amount=amount,
-                        transaction_type='E'
-                    )
 
-                transaction_record.save()
+                ordered_date = timezone.now()
+                ref_code = create_ref_code()
+                ref_code = ref_code.upper()
 
-                messages.success(self.request,"Your Deposit request has been completed succesfully")
-                return redirect("core:deposit-funds")
+                order = Order(
+                    value=deposit_request.amount,
+                    user=self.request.user,
+                    ref_code = ref_code,
+                    ordered_date=ordered_date,
+                    order_type='D'    
+                )
+                order.save()
+
+                deposit_request.order = order 
+                deposit_request.save()
+
+                messages.success(self.request,"Your Deposit request has been approved")
+                return redirect("core:checkout")
             else:
                 messages.warning(self.request, "please enter a valid amount")
                 return redirect("core:deposit-funds")

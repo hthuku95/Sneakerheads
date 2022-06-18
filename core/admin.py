@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, Order, OrderItem,Address,Coupon,Refund,Payment,UserProfile,Wallet,TransactionRecord
+from .models import Item, Order, OrderItem,Address,Coupon,Refund,Payment,UserProfile,Wallet,TransactionRecord,DepositRequest
 
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('title','price','category')
@@ -15,3 +15,4 @@ admin.site.register(Payment)
 admin.site.register(UserProfile)
 admin.site.register(Wallet)
 admin.site.register(TransactionRecord)
+admin.site.register(DepositRequest)
