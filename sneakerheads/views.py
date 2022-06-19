@@ -22,4 +22,5 @@ def index_view(request):
         'items':items
     }
 
+    messages.success(request,"Click the github icon on the footer to view the source code")
     return render(request,'index.htm',context)
