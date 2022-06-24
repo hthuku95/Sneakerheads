@@ -15,3 +15,7 @@ An e-commerce website where users can buy Sneakers, watches, and other clothes c
 1. PayPal Payments Gateway for handling payments
 2. An inapp wallet whereby users can deposit funds and be able to do seamless payments without the need for Paypal or credit card
 3. Accept payments dirrectly from a Paypal account or Credit/Debit card
+
+
+# Url
+- https://sneakerheadsapp.herokuapp.com/
