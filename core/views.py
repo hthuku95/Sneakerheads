@@ -39,7 +39,6 @@ class OrderSummaryView(LoginRequiredMixin,View):
             }
             return render(self.request, 'cart.htm', context)
         except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
             return redirect("core:shop")
 
 
@@ -73,7 +72,6 @@ def add_to_cart(request, slug):
         order = Order.objects.create(
             user=request.user, order_type='BG', ordered_date=ordered_date,ref_code = ref_code)
         order.items.add(order_item)
-        messages.info(request, "This item was added to your cart.")
         return redirect("core:order-summary")
 
 @login_required
@@ -87,15 +85,12 @@ def remove_from_cart(request,slug):
             order_item =  OrderItem.objects.filter(item=item,user=request.user,ordered=False)[0]
             order.items.remove(order_item)
 
-            messages.info(request,"This item was removed from your cart")
             return redirect("core:order-summary")
             
         else:
             #msg order does not contain the order item
-            messages.info(request,"Your cart does not contain the product")
             return redirect("core:product",{'slug':slug})
     else:
-        messages.info(request,"Your cart is empty")
         return redirect("core:product",{'slug':slug})
     return redirect("core:product",{'slug':slug})
 
@@ -121,13 +116,10 @@ def remove_single_item_from_cart(request, slug):
                 order_item.save()
             else:
                 order.items.remove(order_item)
-            messages.info(request, "This item quantity was updated.")
             return redirect("core:order-summary")
         else:
-            messages.info(request, "This item was not in your cart")
             return redirect("core:product", slug=slug)
     else:
-        messages.info(request, "You do not have an active order")
         return redirect("core:product", slug=slug)
 
 class CheckoutView(View):
@@ -166,7 +158,6 @@ class CheckoutView(View):
             return render(self.request,'checkout.htm',context)
 
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have an active order")
             return redirect("core:order-summary")
 
     def post(self,*args,**kwargs):
@@ -190,7 +181,6 @@ class CheckoutView(View):
                             order.shipping_address = shipping_address
                             order.save()
                         else:
-                            messages.info(self.request,"No default shipping Address available")
                             return redirect("core:checkout")
                     else:
                         print("user is entering a new shipping address")
@@ -237,7 +227,6 @@ class CheckoutView(View):
                         order.billing_address = billing_address
                         order.save()
                     else:
-                        messages.info(self.request,"No default billing address available")
                         return redirect("core:checkout")
                 else:
                     print("User is entering a new billing address")
@@ -289,12 +278,10 @@ class CheckoutView(View):
                     )
                     transaction.save()
 
-                    messages.success(self.request, "Yor order has been completed successfully")
                     return redirect("home")
                 return redirect("core:payment")
 
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have an active order")
             return redirect("core:order-summary")
 
 @login_required()
@@ -344,7 +331,6 @@ def payment_complete(request):
             )
             transaction.save()
 
-            messages.success(request,"Deposit completed succesfully")
             return redirect("core:wallet")
 
         transaction = TransactionRecord(
@@ -355,10 +341,8 @@ def payment_complete(request):
 
         transaction.save()
 
-        messages.success(request,"Your order has been completed Successfully")
         return redirect("home")
 
-    messages.warning(request,"An error occured. Please try again")
     return redirect("home")
 
 class WalletView(View):
@@ -377,7 +361,6 @@ class WalletView(View):
             return render(self.request,'wallet.htm',context)
 
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have a wallet")
             return redirect("core:shop")
     def post(self,*args,**kwargs):
         pass
@@ -396,7 +379,6 @@ class WithdrawView(View):
             return render(self.request,'withdraw.htm',context)
 
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have a wallet")
             return redirect("core:shop")
 
     def post(self,*args,**kwargs):
@@ -419,16 +401,12 @@ class WithdrawView(View):
 
                     transaction_record.save()
 
-                    messages.success(self.request,"Your withdrawal request has been completed succesfully")
                     return redirect("core:withdraw-funds")
                 else:
-                    messages.warning(self.request,"You do not have enough funds to complete the request" )
                     return redirect("core:wallet")
             else:
-                messages.warning(self.request,"Please enter a valid amount" )
                 return redirect("core:withdraw-funds")
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have enough funds to complete the request" )
             return redirect("core:wallet")
 
 
@@ -445,7 +423,6 @@ class DepositView(View):
             return render(self.request,'deposit.htm',context)
 
         except ObjectDoesNotExist:
-            messages.warning(self.request,"You do not have a wallet")
             return redirect("core:shop")
 
     def post(self,*args,**kwargs):
@@ -479,11 +456,8 @@ class DepositView(View):
                 deposit_request.order = order 
                 deposit_request.save()
 
-                messages.success(self.request,"Your Deposit request has been approved")
                 return redirect("core:checkout")
             else:
-                messages.warning(self.request, "please enter a valid amount")
                 return redirect("core:deposit-funds")
         except ObjectDoesNotExist:
-            messages.warning(self.request,"Something went wrong please try again later" )
             return redirect("core:wallet")
